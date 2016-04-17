@@ -1,137 +1,135 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-<title>RACHEL - HOME</title>
-<meta http-equiv="content-type" content="text/html; charset=UTF-8">
-<link rel="stylesheet" type="text/css" href="common.css">
-<link rel="stylesheet" type="text/css" href="style.css">
+<meta charset="utf-8">
+<title>Prince of Wales School Digital Library by LAMTECH using RACHEL Content - HOME</title>
+<link rel="stylesheet" href="css/normalize-1.1.3.css">
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/ui-lightness/jquery-ui-1.10.4.custom.min.css">
 <!--[if IE]><script type="text/javascript" src="css3-multi-column.min.js"></script><![endif]-->
-
-    <!-- live search suggestions -->
-    <script type="text/javascript" src="rsphider/include/jQuery/jquery-1.9.1.js"></script>
-    <script type="text/javascript" src="rsphider/include/jQuery/jquery-ui-1.10.2.custom.js"></script>
-    <link rel="stylesheet" href="rsphider/templates/Sphider-plus/jquery-ui-1.10.2.custom.css" type="text/css">
-    <script type="text/javascript">
-    $(function() {
-        $( "#main-search" ).autocomplete({
-            source: "rsphider/include/suggest.php?media_only=0&type=and&catid=0&category=0&db=0&prefix=0",
-            minLength: 1        });
+<script src="js/jquery-1.10.2.min.js"></script>
+<script src="js/jquery-ui-1.10.4.custom.min.js"></script>
+<script>
+    // this sets the autocomplete handler for each module's text input field
+    $(document).ready( function () {
+        $(":text").each( function () {
+            var myid = $(this).attr("id");
+            if (myid) {
+                var moddir = myid.replace(/_search$/, "");
+                $("#"+myid).autocomplete({
+                        source: "modules/"+moddir+"/search/suggest.php",
+                });
+            }
+        });
     });
-    $(function() {
-        $( "#wiki-search" ).autocomplete({
-            source: "rsphider/include/suggest.php?media_only=0&type=and&catid=3&category=3&db=0&prefix=0",
-            minLength: 1        });
-    });
-    $(function() {
-        $( "#hesp-search" ).autocomplete({
-            source: "rsphider/include/suggest.php?media_only=0&type=and&catid=1&category=1&db=0&prefix=0",
-            minLength: 1        });
-    });
-    $(function() {
-        $( "#medl-search" ).autocomplete({
-            source: "rsphider/include/suggest.php?media_only=0&type=and&catid=2&category=2&db=0&prefix=0",
-            minLength: 1        });
-    });
-    </script>
-    <!--/live search suggestions -->
-
+</script>
 </head>
 
-<body onload="$('#main-search').focus();">
-<div id="rachel">
-Rachel
-<div align="right" id="ip"><b>Server Address</b> </br><? echo $_SERVER["SERVER_ADDR"]; ?></div>
+<body>
+<div id="rachel" style="position: relative;">
+   <div class="mainheader">LAMTECH Digital Library</div> 
+    <div id="ip">
+    <?php
+        # some notes to prevent future regression:
+        # the PHP suggested gethostbyname(gethostname())
+        # brings back the unhelpful 127.0.0.1 on RPi systems,
+        # as well as slowing down some Windows installations
+        # with a DNS lookup. $_SERVER["SERVER_ADDR"] will just
+        # display what's in the user's address bar, so also
+        # not useful - using ifconfig/ipconfig is probably
+        # the way to go, but may require some tweaking
+        echo "<b>Server Address</b><br>\n";
+        if (preg_match("/^win/i", PHP_OS)) {
+            # under windows it's ipconfig
+            $output = shell_exec("ipconfig");
+            preg_match("/IPv4 Address.+?: (.+)/", $output, $match);
+            if (isset($match[1])) { echo "$match[1]<br>\n"; }
+        } else if (preg_match("/^darwin/i", PHP_OS)) {
+            # OSX is unix, but it's a little different
+            exec("/sbin/ifconfig", $output);
+            preg_match("/en0.+?inet (.+?) /", join("", $output), $match);
+            if (isset($match[1])) { echo "$match[1]<br>\n"; }
+        } else {
+            # most likely linux based - so ifconfig should work
+            exec("/sbin/ifconfig", $output);
+            preg_match("/eth0.+?inet addr:(.+?) /", join("", $output), $match);
+            if (isset($match[1])) { echo "LAN: $match[1]<br>\n"; }
+            preg_match("/wlan0.+?inet addr:(.+?) /", join("", $output), $match);
+            if (isset($match[1])) { echo "WIFI: $match[1]<br>\n"; }
+        }
+    ?>
+    <a href="admin.php" style="position: absolute; font-size: small; bottom: 6px; right: 8px; color: #999;">reorder content</a>
+    </div>
 </div>
 
-<div class="haut cf">
+<div class="menubar cf">
     <ul>
-    <li><a href="index.php">HOME</a></li>
-    <li><a href="about.html">ABOUT</a></li>
-    <li><a href="./" onclick="javascript:event.target.port=8090" target="_blank">LOCAL CONTENT</a></li>
-    </ul>
-    <form action="rsphider/search.php">
-      <div>
-      <input id="main-search" name="query_t" value="" size="50" autocomplete="off">
-      <input type="submit" value="Search RACHEL">
-      <input type="hidden" name="search" value="1">
-      </div>
-    </form>
+    <li><a href="index.php">Home</a></li>
+   <li><a href="http://192.168.88.1:8090/#/" target="blank">Content Hub</a></li>
+<li><a href="http://192.168.88.1:8008/" target="blank">KA-Lite</a></li>
+<li><a href="http://192.168.88.1:81/wikipedia_en_all_2015-05/?" target="blank">Wikipedia</a></li>
+<li><a href="/modules/PhET/index.html" target="blank">PhET</a></li>
+<li><a href="/modules/powertyping/index.html" target="blank">Typing</a></li>  
+<li><a href="http://www.portal.schools.edu.sl/" target="blank">Open School Portal</a></li>  
+<li><a href="about.html">About</a></li> 
+</ul>
+    
 </div>
 
 <div id="content">
 
 <?php
-
-    $moddir = "modules";
-
-    if (is_dir($moddir)) {
-
-        $handle = opendir($moddir);
-        $count = 0;
-        $modules = array();
-        while ($file = readdir($handle)) {
-            if (preg_match("/^\./", $file)) continue; // skip hidden
-            if (is_dir("$moddir/$file")) { // look in dirs
-                $dir = "$moddir/$file";
-                if (file_exists("$moddir/$file/index.htmlf")) { // check for index fragment
-                    $count++;
-                    $frag = "index.htmlf";
-                    $content = file_get_contents("$dir/$frag");
-                    preg_match("/<!-- *position *\: *(\d+) *-->/", $content, $match);
-                    array_push($modules, array(
-                        'file' => $file,
-                        'dir'  => $dir, // this is used by the include to know it's directory
-                        'frag' => "$dir/$frag", // this is what is actually included
-                        'position' => $match[1]
-                    ));
-                } else {
-                    # there was no index fragment, so...
-                    array_push($modules, array(
-                        'file' => $file, // this is the name of the module
-                        'dir'  => $dir, // this is the module's directory
-                        'frag' => "nofrag.php", // we include a special fragment
-                        'position' => 9999
-                    ));
-                }
+    require_once("common.php");
+    
+    $fsmods = getmods_fs();
+    # if there were any modules found in the filesystem
+    if ($fsmods) {
+        # get a list from the databases (where the sorting
+        # and visibility is stored)
+        $dbmods = getmods_db();
+        # populate the module list from the filesystem 
+        # with the visibility/sorting info from the database
+        foreach (array_keys($dbmods) as $moddir) {
+            if (isset($fsmods[$moddir])) {
+                $fsmods[$moddir]['position'] = $dbmods[$moddir]['position'];
+                $fsmods[$moddir]['hidden'] = $dbmods[$moddir]['hidden'];
             }
         }
-        closedir($handle);
-
-        function bypos($a, $b) {
-            return $a['position'] - $b['position'];
+        # custom sorting function in common.php
+        uasort($fsmods, 'bypos');
+        # whether or not we were able to get anything
+        # from the DB, we show what we found in the filesystem
+        $modcount = 0;
+        foreach (array_values($fsmods) as $mod) {
+            if ($mod['hidden'] || $mod['nohtmlf']) { continue; }
+            $dir  = $mod['dir'];
+            $moddir  = $mod['moddir'];
+            include "$mod[dir]/index.htmlf";
+            ++$modcount;
         }
-
-        if ($count == 0) {
-            echo "No modules found.\n";
-        } else {
-            usort($modules, 'bypos');
-            foreach ($modules as $mod) {
-                $file = $mod['file']; // only matters for modules without a fragment
-                $dir  = $mod['dir'];
-                include $mod['frag'];
-            }
-        }
-
-    } else {
-
-        echo "No module directory found.\n";
-
     }
-
+    if ($modcount == 0) {
+        echo "<h2>No modules found.</h2>\n";
+        echo "Please check there are modules in the modules directory,\n";
+        echo "and that they are not all hidden on the admin page.\n";
+    }
 ?>
 
 </div>
 
-<div class="haut cf" style="margin-bottom: 80px;">
+<div class="menubar cf" style="margin-bottom: 80px;">
     <ul>
-    <li><a href="index.php">HOME</a></li>
-    <li><a href="about.html">ABOUT</a></li>
-    <li><a href="./" onclick="javascript:event.target.port=8090" target="_blank">LOCAL CONTENT</a></li>   
-    <li><a href+"mailto:info@worldpossible.org">email: info@worldpossible.org</a></li>
+     <li><a href="index.php">Home</a></li>
+   <li><a href="http://192.168.88.1:8090/#/" target="blank">Content Hub</a></li>
+<li><a href="http://192.168.88.1:8008/" target="blank">KA-Lite</a></li>
+<li><a href="http://192.168.88.1:81/wikipedia_en_all_2015-05/?" target="blank">Wikipedia</a></li>
+<li><a href="/modules/PhET/index.html" target="blank">PhET</a></li>
+<li><a href="/modules/powertyping/index.html" target="blank">Typing</a></li>  
+<li><a href="http://www.portal.schools.edu.sl/" target="blank">Open School Portal</a></li>  
+<li><a href="about.html">About</a></li> 
     </ul>
-    <div id="footer_right">RACHEL by World Possible</div>
+    <div id="footer_right">RACHEL+ 1.1(beta)</div>
 </div>
 
 </body>
 </html>
-
